@@ -1,3 +1,4 @@
+import {ClerkProvider} from "@clerk/nextjs";
 import {ThemeProvider as NextThemesProvider} from "next-themes";
 
 const Providers = ({children}: {children: React.ReactNode}) => {
@@ -9,7 +10,7 @@ const Providers = ({children}: {children: React.ReactNode}) => {
         enableSystem
         disableTransitionOnChange
       >
-        {children}
+        <ClerkProvider>{children}</ClerkProvider>
       </NextThemesProvider>
     </>
   );
