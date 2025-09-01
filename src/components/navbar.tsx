@@ -1,3 +1,5 @@
+import {UserButton} from "@clerk/nextjs";
+
 import Logo from "./logo";
 import {ThemeSwitch} from "./theme-switch";
 import UploadButton from "./upload/upload-button";
@@ -13,6 +15,8 @@ const Navbar = () => {
         <div className="flex min-w-8">
           <UploadButton />
         </div>
+
+        <UserButton />
       </div>
     </nav>
   );
