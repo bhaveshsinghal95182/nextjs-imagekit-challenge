@@ -31,7 +31,12 @@ export function PreviewCanvas({
           Live preview
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-xs text-foreground/60">{zoom}%</span>
+          <span
+            className="text-xs text-foreground/60 cursor-pointer"
+            onClick={() => onZoomChange(100)}
+          >
+            {zoom}%
+          </span>
           <Slider
             className="w-40 cursor-pointer"
             value={[zoom]}
