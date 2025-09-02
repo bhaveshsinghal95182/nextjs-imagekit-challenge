@@ -119,7 +119,7 @@ export function StudioDock({
                     onBlur={() => setHoverIndex(null)}
                     onClick={() => handleSelect(key)}
                     className={[
-                      "relative size-10 rounded-full transition-all duration-150",
+                      "relative size-10 rounded-full transition-all duration-150 ease-out",
                       "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500/60",
                       isActive
                         ? "bg-pink-500/15 ring-1 ring-pink-500/30 dark:bg-pink-400/15"

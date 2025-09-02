@@ -136,7 +136,7 @@ export function ImageBasicsPanel({
   return (
     <div className="h-full flex flex-col md:overflow-y-scroll space-y-1 scrollbar-thin scrollbar-thumb-gray-300">
       <div>
-        <Accordion type="multiple">
+        <Accordion type="multiple" className="accordion">
           <AccordionItem value="resize-crop">
             <AccordionTrigger className="py-3 cursor-pointer">
               <div className="flex items-center gap-2">
