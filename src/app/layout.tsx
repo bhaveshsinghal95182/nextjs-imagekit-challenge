@@ -1,5 +1,6 @@
 import type {Metadata} from "next";
 import {Geist_Mono, Montserrat, Onest, Puppies_Play} from "next/font/google";
+import * as React from "react";
 
 import Footer from "@/components/footer";
 import Navbar from "@/components/navbar";
