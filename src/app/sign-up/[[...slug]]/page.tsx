@@ -8,6 +8,7 @@ import {useSignUp} from "@clerk/nextjs";
 
 import AuthCard from "@/components/auth/auth-card";
 import ErrorBanner from "@/components/auth/error-banner";
+import OtpInput from "@/components/auth/otp-input";
 import PrimaryButton from "@/components/ui/primary-button";
 import TextField from "@/components/ui/text-field";
 import ROUTES from "@/constants/routes";
@@ -113,14 +114,7 @@ export default function Page() {
         <form onSubmit={handleVerify} className="space-y-3">
           <ErrorBanner message={error} />
 
-          <TextField
-            id="code"
-            name="code"
-            value={code}
-            onChange={e => setCode(e.target.value)}
-            placeholder="123456"
-            label="Verification code"
-          />
+          <OtpInput value={code} onChange={setCode} />
 
           <div className="flex items-center justify-between gap-3 mt-3">
             <div className="flex-1">
