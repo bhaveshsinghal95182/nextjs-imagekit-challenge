@@ -1,9 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import {useRouter} from "next/navigation";
 import * as React from "react";
 
 import {useSignUp} from "@clerk/nextjs";
+
+import ROUTES from "@/constants/routes";
 
 export default function Page() {
   const {isLoaded, signUp, setActive} = useSignUp();
@@ -219,8 +222,14 @@ export default function Page() {
 
           <div id="clerk-captcha" />
 
-          <div className="mt-4 text-center text-sm text-muted-foreground">
-            By continuing you agree to the Terms of Service.
+          <div className="mt-4 text-center text-xs text-muted-foreground">
+            Already have an account?{" "}
+            <Link href={ROUTES["SIGN-IN"]} className="inline-block group ml-1">
+              <span className="relative inline-block pb-0.5 text-sm hover:text-foreground">
+                Sign in
+                <span className="absolute left-0 bottom-0 w-full h-[2px] bg-current transform scale-x-0 origin-center transition-transform duration-300 group-hover:scale-x-100" />
+              </span>
+            </Link>
           </div>
         </form>
       </div>
