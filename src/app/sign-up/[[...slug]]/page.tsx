@@ -6,7 +6,12 @@ import * as React from "react";
 
 import {useSignUp} from "@clerk/nextjs";
 
+import AuthCard from "@/components/auth/auth-card";
+import ErrorBanner from "@/components/auth/error-banner";
+import PrimaryButton from "@/components/ui/primary-button";
+import TextField from "@/components/ui/text-field";
 import ROUTES from "@/constants/routes";
+import formatError from "@/hooks/use-error-message";
 
 export default function Page() {
   const {isLoaded, signUp, setActive} = useSignUp();
@@ -18,22 +23,7 @@ export default function Page() {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const router = useRouter();
 
-  const getErrorMessage = (err: unknown) => {
-    // Prefer common fields, fall back to stringified object
-    try {
-      if (!err) return "An unknown error occurred.";
-      if (typeof err === "string") return err;
-      // Clerk errors may have a `message` property
-      const anyErr = err as unknown & {message?: string; errors?: unknown};
-      if (anyErr.message) return String(anyErr.message);
-      // Some errors include an `errors` array or `errors` object
-      if (anyErr.errors) return JSON.stringify(anyErr.errors);
-      // If it's an object, return a compact JSON
-      return JSON.stringify(err, null, 2);
-    } catch (_e) {
-      return "An error occurred (failed to parse).";
-    }
-  };
+  const getErrorMessage = formatError;
 
   // Handle submission of the sign-up form
   const handleSubmit = async (e: React.FormEvent) => {
@@ -116,123 +106,82 @@ export default function Page() {
   // Display the verification form to capture the OTP code
   if (verifying) {
     return (
-      <main className="min-h-[60vh] flex items-center justify-center px-4">
-        <div className="max-w-md mx-auto w-full bg-card/95 p-6 rounded-xl shadow-lg border border-border/40">
-          <h1 className="text-2xl font-semibold mb-2 text-foreground">
-            Verify your email
-          </h1>
-          <p className="text-sm text-muted-foreground mb-4">
-            Enter the verification code we sent to your email address.
-          </p>
+      <AuthCard
+        title="Verify your email"
+        subtitle="Enter the verification code we sent to your email address."
+      >
+        <form onSubmit={handleVerify} className="space-y-3">
+          <ErrorBanner message={error} />
 
-          <form onSubmit={handleVerify} className="space-y-3">
-            {error ? (
-              <div
-                role="alert"
-                className="rounded-md bg-red-50 border border-red-200 p-2 text-sm text-red-700"
-              >
-                {error}
-              </div>
-            ) : null}
-
-            <label className="sr-only" htmlFor="code">
-              Verification code
-            </label>
-            <input
-              id="code"
-              name="code"
-              value={code}
-              onChange={e => setCode(e.target.value)}
-              placeholder="123456"
-              className="w-full rounded-full px-4 py-2 border border-transparent bg-input text-foreground placeholder:opacity-60 focus:outline-none focus:ring-2 focus:ring-primary/30 transition"
-            />
-
-            <div className="flex items-center justify-between gap-3 mt-3">
-              <div className="flex-1">
-                <button
-                  type="submit"
-                  className="w-full rounded-full py-2 px-4 bg-gradient-to-r from-pink-500 to-pink-700 text-white font-medium shadow hover:opacity-95 active:opacity-90"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? "Verifying..." : "Verify"}
-                </button>
-              </div>
-            </div>
-          </form>
-        </div>
-      </main>
-    );
-  }
-
-  return (
-    <main className="min-h-[60vh] flex items-center justify-center px-4">
-      <div className="max-w-md mx-auto w-full bg-card/95 p-6 rounded-xl shadow-lg border border-border/40">
-        <h1 className="text-2xl font-semibold mb-2 text-foreground">
-          Create your account
-        </h1>
-        <p className="text-sm text-muted-foreground mb-4">
-          Sign up to save and transform your memories.
-        </p>
-        <form onSubmit={handleSubmit} className="space-y-3">
-          {error ? (
-            <div
-              role="alert"
-              className="rounded-md bg-red-50 border border-red-200 p-2 text-sm text-red-700"
-            >
-              {error}
-            </div>
-          ) : null}
-          <label className="sr-only" htmlFor="email">
-            Email address
-          </label>
-          <input
-            id="email"
-            type="email"
-            name="email"
-            placeholder="you@domain.com"
-            value={emailAddress}
-            onChange={e => setEmailAddress(e.target.value)}
-            className="w-full rounded-full px-4 py-2 border border-transparent bg-input text-foreground placeholder:opacity-60 focus:outline-none focus:ring-2 focus:ring-primary/30 transition"
-          />
-
-          <label className="sr-only" htmlFor="password">
-            Password
-          </label>
-          <input
-            id="password"
-            type="password"
-            name="password"
-            placeholder="Create a password"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            className="w-full rounded-full px-4 py-2 border border-transparent bg-input text-foreground placeholder:opacity-60 focus:outline-none focus:ring-2 focus:ring-primary/30 transition"
+          <TextField
+            id="code"
+            name="code"
+            value={code}
+            onChange={e => setCode(e.target.value)}
+            placeholder="123456"
+            label="Verification code"
           />
 
           <div className="flex items-center justify-between gap-3 mt-3">
             <div className="flex-1">
-              <button
-                type="submit"
-                className="w-full rounded-full py-2 px-4 bg-gradient-to-r from-pink-500 to-pink-700 text-white font-medium shadow hover:opacity-95 active:opacity-90"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? "Creating account..." : "Continue"}
-              </button>
+              <PrimaryButton type="submit" isLoading={isSubmitting}>
+                Verify
+              </PrimaryButton>
             </div>
           </div>
-
-          <div id="clerk-captcha" />
-
-          <div className="mt-4 text-center text-xs text-muted-foreground">
-            Already have an account?{" "}
-            <Link href={ROUTES["SIGN-IN"]} className="inline-block group ml-1">
-              <span className="relative inline-block pb-0.5 text-sm hover:text-foreground">
-                Sign in
-                <span className="absolute left-0 bottom-0 w-full h-[2px] bg-current transform scale-x-0 origin-center transition-transform duration-300 group-hover:scale-x-100" />
-              </span>
-            </Link>
-          </div>
         </form>
-      </div>
-    </main>
+      </AuthCard>
+    );
+  }
+
+  return (
+    <AuthCard
+      title="Create your account"
+      subtitle="Sign up to save and transform your memories."
+    >
+      <form onSubmit={handleSubmit} className="space-y-3">
+        <ErrorBanner message={error} />
+
+        <TextField
+          id="email"
+          type="email"
+          name="email"
+          placeholder="you@domain.com"
+          value={emailAddress}
+          onChange={e => setEmailAddress(e.target.value)}
+          label="Email address"
+        />
+
+        <TextField
+          id="password"
+          type="password"
+          name="password"
+          placeholder="Create a password"
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+          label="Password"
+        />
+
+        <div className="flex items-center justify-between gap-3 mt-3">
+          <div className="flex-1">
+            <PrimaryButton type="submit" isLoading={isSubmitting}>
+              Continue
+            </PrimaryButton>
+          </div>
+        </div>
+
+        <div id="clerk-captcha" />
+
+        <div className="mt-4 text-center text-xs text-muted-foreground">
+          Already have an account?{" "}
+          <Link href={ROUTES["SIGN-IN"]} className="inline-block group ml-1">
+            <span className="relative inline-block pb-0.5 text-sm hover:text-foreground">
+              Sign in
+              <span className="absolute left-0 bottom-0 w-full h-[2px] bg-current transform scale-x-0 origin-center transition-transform duration-300 group-hover:scale-x-100" />
+            </span>
+          </Link>
+        </div>
+      </form>
+    </AuthCard>
   );
 }
