@@ -4,14 +4,18 @@ import Link from "next/link";
 import {useRouter} from "next/navigation";
 import * as React from "react";
 
-import {GoogleOneTap, useSignIn} from "@clerk/nextjs";
+import {useSignIn} from "@clerk/nextjs";
+import {OAuthStrategy} from "@clerk/types";
 
 import AuthCard from "@/components/auth/auth-card";
 import ErrorBanner from "@/components/auth/error-banner";
+import GoogleLogo from "@/components/logos/google";
 import PrimaryButton from "@/components/ui/primary-button";
 import TextField from "@/components/ui/text-field";
 import ROUTES from "@/constants/routes";
 import formatError from "@/hooks/use-error-message";
+
+import {Button} from "../ui/button";
 
 export default function SignInFlow() {
   const {isLoaded, signIn, setActive} = useSignIn();
@@ -63,12 +67,44 @@ export default function SignInFlow() {
     }
   };
 
+  const signInWith = async (strategy: OAuthStrategy) => {
+    if (!signIn) return;
+    setError(null);
+
+    try {
+      await signIn.authenticateWithRedirect({
+        strategy,
+        redirectUrl: "/sign-in/sso-callback",
+        redirectUrlComplete: ROUTES["HOME"],
+      });
+    } catch (err: unknown) {
+      const msg = getErrorMessage(err);
+      setError(msg);
+      console.error(err);
+    }
+  };
+
   return (
     <AuthCard
       title="Sign in"
       subtitle="Sign in to access your account and manage your memories."
     >
-      <GoogleOneTap />
+      <Button
+        onClick={() => signInWith("oauth_google")}
+        variant="outline"
+        size="default"
+        className="w-full justify-center gap-3 py-2"
+        type="button"
+      >
+        <GoogleLogo className="h-5 w-5" />
+        <span className="font-medium">Sign in with Google</span>
+      </Button>
+
+      <div className="flex items-center my-4">
+        <span className="flex-1 h-px bg-border/40 dark:bg-border/30" />
+        <span className="mx-3 text-xs text-muted-foreground">OR</span>
+        <span className="flex-1 h-px bg-border/40 dark:bg-border/30" />
+      </div>
 
       <form onSubmit={handleSubmit} className="space-y-3">
         <ErrorBanner message={error} />

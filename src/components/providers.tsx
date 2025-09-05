@@ -1,3 +1,5 @@
+"use client";
+
 import {ClerkProvider} from "@clerk/nextjs";
 import {ThemeProvider as NextThemesProvider} from "next-themes";
 

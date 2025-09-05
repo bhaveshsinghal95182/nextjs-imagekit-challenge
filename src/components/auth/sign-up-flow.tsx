@@ -4,7 +4,8 @@ import Link from "next/link";
 import {useRouter} from "next/navigation";
 import * as React from "react";
 
-import {GoogleOneTap, useSignUp} from "@clerk/nextjs";
+import * as Clerk from "@clerk/elements/common";
+import {useSignUp} from "@clerk/nextjs";
 
 import AuthCard from "@/components/auth/auth-card";
 import ErrorBanner from "@/components/auth/error-banner";
@@ -118,7 +119,9 @@ export default function SignUpFlow() {
       title="Create your account"
       subtitle="Sign up to save and transform your memories."
     >
-      <GoogleOneTap />
+      {isLoaded && (
+        <Clerk.Connection name="google">Sign in with Google</Clerk.Connection>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-3">
         <ErrorBanner message={error} />

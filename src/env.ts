@@ -4,6 +4,9 @@ const envSchema = z.object({
   NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY: z
     .string()
     .min(1, "ImageKit public key is required"),
+  NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z
+    .string()
+    .min(1, "Clerk publishable key is required"),
   NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT: z.url("Must be a valid URL"),
   IMAGEKIT_PRIVATE_KEY: z.string().min(1, "ImageKit private key is required"),
   DATABASE_URL: z.url("Database URL is missing"),
