@@ -1,5 +1,6 @@
 import {NextResponse} from "next/server";
 
+import {auth} from "@clerk/nextjs/server";
 import {getUploadAuthParams} from "@imagekit/next/server";
 
 import {env} from "@/env";
@@ -8,6 +9,11 @@ export async function GET() {
   try {
     // Your application logic to authenticate the user
     // For now, we'll allow all uploads, but you can add authentication logic here
+
+    const {userId} = await auth();
+    if (!userId)
+      return NextResponse.json({error: "Unauthorized Upload"}, {status: 401});
+
     const {token, expire, signature} = getUploadAuthParams({
       privateKey: env.IMAGEKIT_PRIVATE_KEY,
       publicKey: env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY,
