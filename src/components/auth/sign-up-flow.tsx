@@ -4,8 +4,8 @@ import Link from "next/link";
 import {useRouter} from "next/navigation";
 import * as React from "react";
 
-import * as Clerk from "@clerk/elements/common";
 import {useSignUp} from "@clerk/nextjs";
+import {OAuthStrategy} from "@clerk/types";
 
 import AuthCard from "@/components/auth/auth-card";
 import ErrorBanner from "@/components/auth/error-banner";
@@ -14,6 +14,9 @@ import PrimaryButton from "@/components/ui/primary-button";
 import TextField from "@/components/ui/text-field";
 import ROUTES from "@/constants/routes";
 import formatError from "@/hooks/use-error-message";
+
+import GoogleLogo from "../logos/google";
+import {Button} from "../ui/button";
 
 export default function SignUpFlow() {
   const {isLoaded, signUp, setActive} = useSignUp();
@@ -26,6 +29,20 @@ export default function SignUpFlow() {
   const router = useRouter();
 
   const getErrorMessage = formatError;
+
+  const signInWith = async (strategy: OAuthStrategy) => {
+    setError(null);
+    try {
+      await signUp?.authenticateWithRedirect({
+        strategy,
+        redirectUrl: "/sign-in/sso-callback",
+        redirectUrlComplete: "/",
+      });
+    } catch (err: unknown) {
+      setError(formatError(err));
+      console.error(err);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -119,10 +136,6 @@ export default function SignUpFlow() {
       title="Create your account"
       subtitle="Sign up to save and transform your memories."
     >
-      {isLoaded && (
-        <Clerk.Connection name="google">Sign in with Google</Clerk.Connection>
-      )}
-
       <form onSubmit={handleSubmit} className="space-y-3">
         <ErrorBanner message={error} />
 
@@ -166,6 +179,23 @@ export default function SignUpFlow() {
           </Link>
         </div>
       </form>
+      <div className="flex flex-col gap-4 mt-4">
+        <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
+          <span className="bg-card text-muted-foreground relative z-10 px-2">
+            Or continue with
+          </span>
+        </div>
+        <Button
+          onClick={() => signInWith("oauth_google")}
+          variant="outline"
+          size="default"
+          className="w-full justify-center gap-3 py-2"
+          type="button"
+        >
+          <GoogleLogo className="h-5 w-5" />
+          <span className="font-medium">Sign up with Google</span>
+        </Button>
+      </div>
     </AuthCard>
   );
 }
