@@ -13,7 +13,7 @@ const UploadButton = () => {
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [signInModalOpen, setSignInModalOpen] = useState(false);
 
-  const {isLoaded, isSignedIn} = useUser();
+  const {isSignedIn} = useUser();
 
   const handleUploadClick = () => {
     if (!isSignedIn) {
