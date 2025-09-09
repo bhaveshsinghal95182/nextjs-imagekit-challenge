@@ -104,7 +104,11 @@ export const useImageKitUpload = () => {
   }, [files]);
 
   const saveToDatabase = useCallback(
-    async (fileData: UploadFile, uploadResponse: UploadResponse) => {
+    async (
+      fileData: UploadFile,
+      uploadResponse: UploadResponse,
+      isPrivate: boolean = false
+    ) => {
       try {
         const mediaType = fileData.file.type.startsWith("image/")
           ? "IMAGE"
@@ -117,6 +121,7 @@ export const useImageKitUpload = () => {
           transformationConfig: {
             type: mediaType,
           },
+          isPrivate,
         });
 
         if (!result.success) {
@@ -192,7 +197,11 @@ export const useImageKitUpload = () => {
           )
         );
 
-        await saveToDatabase(fileData, uploadResponse);
+        await saveToDatabase(
+          fileData,
+          uploadResponse,
+          options.isPrivateFile ?? false
+        );
 
         return uploadResponse;
       } catch (error) {

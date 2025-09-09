@@ -1,5 +1,12 @@
 import {InferSelectModel} from "drizzle-orm";
-import {jsonb, pgTable, text, uuid, varchar} from "drizzle-orm/pg-core";
+import {
+  boolean,
+  jsonb,
+  pgTable,
+  text,
+  uuid,
+  varchar,
+} from "drizzle-orm/pg-core";
 import {createInsertSchema} from "drizzle-zod";
 import {z} from "zod/v4";
 
@@ -16,6 +23,7 @@ export const media = pgTable("media", {
     .$type<TransformationConfig>()
     .default({} as TransformationConfig),
   mediaType: mediaTypeEnum("type"),
+  isPrivate: boolean("is_private").default(false).notNull(),
   ...timestamps,
 });
 
@@ -32,11 +40,13 @@ const baseSchema = createInsertSchema(media, {
     .url({message: "Please provide a valid transformed URL."})
     .optional(),
   mediaType: schema => schema,
+  isPrivate: z.boolean().default(false),
 }).pick({
   fileName: true,
   originalUrl: true,
   transformedUrl: true,
   mediaType: true,
+  isPrivate: true,
 });
 
 export const createMediaSchema = z.object({
@@ -45,6 +55,7 @@ export const createMediaSchema = z.object({
   mediaType: baseSchema.shape.mediaType,
   transformedUrl: baseSchema.shape.transformedUrl,
   transformationConfig: z.any().optional(),
+  isPrivate: baseSchema.shape.isPrivate,
 });
 
 export const updateMediaSchema = z.object({
@@ -54,6 +65,7 @@ export const updateMediaSchema = z.object({
   transformedUrl: baseSchema.shape.transformedUrl,
   mediaType: baseSchema.shape.mediaType.optional(),
   transformationConfig: z.any().optional(),
+  isPrivate: baseSchema.shape.isPrivate.optional(),
 });
 
 export const mediaQuerySchema = z.object({

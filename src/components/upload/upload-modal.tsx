@@ -1,5 +1,7 @@
 "use client";
 
+import {useState} from "react";
+
 import {
   AlertCircle,
   CheckCircle,
@@ -18,9 +20,18 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import {Progress} from "@/components/ui/progress";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import {useImageKitUpload} from "@/hooks/use-imagekit-upload";
 import {formatFileSize, getFileIcon, getStatusIcon} from "@/lib/upload-utils";
 import {cn} from "@/lib/utils";
+
+import {Label} from "../ui/label";
+import {Switch} from "../ui/switch";
 
 type UploadModalProps = {
   open: boolean;
@@ -28,6 +39,7 @@ type UploadModalProps = {
   uploadOptions?: {
     folder?: string;
     tags?: string[];
+    isPrivateFile?: boolean;
   };
 };
 
@@ -36,6 +48,7 @@ const UploadModal = ({
   onOpenChange,
   uploadOptions = {},
 }: UploadModalProps) => {
+  const [isPrivate, setIsPrivate] = useState(false);
   const {
     files,
     addFiles,
@@ -62,11 +75,17 @@ const UploadModal = ({
   });
 
   const handleUploadAll = () => {
-    uploadAllFiles(uploadOptions);
+    uploadAllFiles({
+      ...uploadOptions,
+      isPrivateFile: isPrivate,
+    });
   };
 
   const handleRetry = (id: string) => {
-    retryFile(id, uploadOptions);
+    retryFile(id, {
+      ...uploadOptions,
+      isPrivateFile: isPrivate,
+    });
   };
 
   return (
@@ -112,20 +131,52 @@ const UploadModal = ({
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold">Files ({files.length})</h3>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={clearAllFiles}
-                  disabled={isUploading}
-                >
-                  Clear All
-                </Button>
+                <div className="flex items-center space-x-2">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="flex items-center space-x-2">
+                          <Switch
+                            id="private"
+                            checked={isPrivate}
+                            onCheckedChange={setIsPrivate}
+                            disabled={isUploading}
+                          />
+                          <Label
+                            htmlFor="private"
+                            className="text-xs cursor-pointer"
+                          >
+                            Private {isPrivate && "🔒"}
+                          </Label>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="text-sm">
+                          Private files require authentication to access and
+                          won&apos;t appear in public galleries
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={clearAllFiles}
+                    disabled={isUploading}
+                  >
+                    Clear All
+                  </Button>
+                </div>
               </div>
 
               {files.map(uploadFile => (
                 <div
                   key={uploadFile.id}
-                  className="space-y-3 rounded-lg border p-4"
+                  className={cn(
+                    "space-y-3 rounded-lg border p-4",
+                    isPrivate &&
+                      "border-amber-200 bg-amber-50/50 dark:border-amber-800/30 dark:bg-amber-900/10"
+                  )}
                 >
                   <div className="flex items-center gap-x-3">
                     <div className="flex items-center">
@@ -133,9 +184,11 @@ const UploadModal = ({
                     </div>
 
                     <div className="min-w-0 flex-1">
-                      <p className="truncate font-medium">
-                        {uploadFile.file.name}
-                      </p>
+                      <div className="flex items-center gap-2">
+                        <p className="truncate font-medium">
+                          {uploadFile.file.name}
+                        </p>
+                      </div>
                       <p className="text-sm text-gray-500">
                         {formatFileSize(uploadFile.file.size)}
                       </p>
